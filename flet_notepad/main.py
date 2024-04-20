@@ -1,78 +1,89 @@
-from flet import (UserControl,
-                  TextField,
-                  InputBorder,
-                  Page,
-                  ControlEvent,
-                  app)
-import flet as ft
-from threading import Timer
-from time import sleep
+from flet import ( UserControl, TextField, InputBorder,
+                   IconButton, ThemeMode, Page,
+                   Text, Icon, icons, ButtonStyle, 
+                   colors, ControlEvent, AppBar, app
+                 )
+from os import path, remove
 
-class TextEditor(UserControl):
-    def __init__(self) -> None:
-        super().__init__()
-        self.textfield = TextField(multiline=True,
-                                   autofocus=True,
-                                   border=InputBorder.NONE,
-                                   min_lines=40,
-                                   on_focus = self.save_text,
-                                   content_padding=30,
-                                   cursor_color='yellow',
-                                   focused_border_color = 'PINK '
-                                   )
-    def save_text(self, e: ControlEvent) -> None:
-        sleep(5.0)
+#from threading import Timer
+#from time import sleep             // eksperymentalne
+
+
+txtfield = TextField( multiline=True,
+                      autofocus=True,
+                      border=InputBorder.NONE,
+                      min_lines=40,
+                      content_padding=30,
+                      hint_text='Wprowadź tekst',
+                      cursor_color='yellow',
+                      focused_border_color='pink'
+                    )
+                 
+
+def main(page: Page) -> None:
+    page.title = 'Notepad FLET'
+    page.scroll = True
+    page.theme_mode = ThemeMode.DARK
+    
+    def changeTheme(e: ControlEvent) -> None:
+        page.theme_mode = (
+            ThemeMode.LIGHT
+            if page.theme_mode == ThemeMode.DARK
+            else ThemeMode.DARK
+        )
+        change_cursor_color()
+        
+        toggleButton.selected = not toggleButton.selected
+        page.update()
+        
+    def change_cursor_color() -> None:
+        if txtfield.cursor_color == 'yellow': txtfield.cursor_color = 'blue'
+        else :                                txtfield.cursor_color = 'yellow'
+        
+    toggleButton = IconButton( on_click=changeTheme,
+                               icon=icons.LIGHT_MODE_OUTLINED,
+                               selected_icon='nightlight',
+                               style=ButtonStyle(color={'':colors.WHITE, 
+                                                        'selected':colors.BLACK})
+                             )
+    
+    def save_text(e: ControlEvent) -> None:
         with open('save.txt', 'w') as f:
-            f.write(self.textfield.value)
-            print("File has been saved!")
-            self.save_text(e)
-                       
-    def read_text(self) -> str | None:
+            f.write(txtfield.value)
+            
+            if(txtfield.value == "crash me pls"):
+                if path.exists("./save.txt"):
+                    f.close()
+                    remove("save.txt")
+                    exit()
+                else:
+                    print("Plik nie odnaleziony!")
+                  
+    def read_text() -> str | None:
         try:
             with open('save.txt', 'r') as f:
                 return f.read()
         except FileNotFoundError:
-            self.textfield.hint_text = "Welcome to the text editor!"
+            txtfield.hint_text = "Witaj w edytorze tekstu!"
             
-    def build(self) -> TextField:
-        self.textfield.value = self.read_text()
-        return self.textfield
+    txtfield.on_change = save_text
+            
+    def build() -> TextField:
+        txtfield.value = read_text()
+        return txtfield
     
-      
-def hide_button(e: ControlEvent) -> None:
-    e.visible = False
-         
-
-def main(page: ft.Page) -> None:
-    page.title = 'Notepad in Flet'
-    page.scroll = True
+    build()
     
-    button = ft.ElevatedButton(
-                content=ft.Container(
-                    content=ft.Column(
-                        [
-                            ft.Text(value="file has been saved", size=20)
-                        ]
-                    ),
-                    padding=ft.padding.all(10)
-                ),
-                visible=True,
-                on_click=hide_button,
-            )
+    page.add(
+        AppBar(
+            leading=Icon(icons.TEXT_SNIPPET),
+            title=Text("Notepad"),
+            actions=[toggleButton],
+            bgcolor=colors.SURFACE_VARIANT
+        ))
+    page.add(txtfield)
     
-    st = ft.Stack(
-        [
-            TextEditor(),
-            ft.Container(
-                button,
-                alignment=ft.MainAxisAlignment.CENTER
-            )
-        ]
-    )
-    
-    page.add(st)
-    # page.add(TextEditor())
         
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    app(target=main)
