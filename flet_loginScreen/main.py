@@ -1,5 +1,5 @@
 import flet as ft
-from flet import TextField, Text, Row, Column, Checkbox, ElevatedButton
+from flet import TextField, Text, Row, Column, Checkbox, ElevatedButton, TextButton
 from flet_core.control_event import ControlEvent
 
 
@@ -23,7 +23,7 @@ def main(page: ft.Page) -> None:
     button_submit: ElevatedButton = ElevatedButton(text='Zarejestruj się', width=200, disabled=True)
     
     company_rules: Text = Text(text_align=ft.TextAlign.LEFT, width=350)
-    button_close_rules: ft.TextButton = ft.TextButton(text='Zapoznałem się z treścią regulaminu :)', width=350)
+    button_close_rules: TextButton = TextButton(text='Zapoznałem się z treścią regulaminu :)', width=350)
     
     def validate(e: ControlEvent) -> None:
         if all([text_username.value, text_password.value, checkbox_signup.value]):
@@ -79,11 +79,11 @@ def main(page: ft.Page) -> None:
             )
         )
         
-        
     checkbox_signup.on_change = validate
     text_username.on_change = validate
     text_password.on_change = validate
     button_submit.on_click = submit
+    
     button_close_rules.on_click = login
     
     login()
