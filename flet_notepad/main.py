@@ -55,7 +55,6 @@ def main(page: Page) -> None:
                 if path.exists("./save.txt"):
                     f.close()
                     remove("save.txt")
-                    exit()
                 else:
                     print("Plik nie odnaleziony!")
                   
