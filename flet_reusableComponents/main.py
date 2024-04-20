@@ -1,17 +1,18 @@
 import flet as ft
 from flet import UserControl, Text, Row, Page, ControlEvent, MainAxisAlignment, ElevatedButton
 
-
 class IncrementCounter(UserControl):
     def __init__(self, text: str, start_number: int = 0) -> None:
         super().__init__()
         self.text = text
         self.counter = start_number
-        self.text_number: Text = Text(value=str(start_number), size=40)
+        self.text_number: Text = Text(value=str(start_number), size=(start_number // 10) * 8 + 15)
         
     def increment(self, e: ControlEvent) -> None:
         self.counter += 1
         self.text_number.value = str(self.counter)
+        if(self.counter % 10 == 0): 
+            self.text_number.size += 8
         self.update()
 
     def build(self) -> Row:
@@ -31,9 +32,9 @@ def main(page: ft.Page):
     page.window_resizable = False
     
     
-    page.add(IncrementCounter('People'))
-    page.add(IncrementCounter('Stones', 25))
-    page.add(IncrementCounter('Animals', 50))
+    page.add(IncrementCounter('Ludzie'))
+    page.add(IncrementCounter('Kamyki', 13))
+    page.add(IncrementCounter('Słonie', 38))
 
 if __name__ == '__main__':
     ft.app(target=main)
